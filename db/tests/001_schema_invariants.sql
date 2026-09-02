@@ -10,7 +10,7 @@
 begin;
 create extension if not exists pgtap;
 
-select plan(25);
+select plan(32);
 
 -- ---------------------------------------------------------------------------
 -- 1. RLS is on everywhere. Default deny is the whole security model; a single
@@ -132,6 +132,38 @@ select ok(not wassalni_contains_sensitive_number('حوالي 1500 جنيه'),
 
 select ok(not wassalni_contains_sensitive_number('مبنى 5 قاعة 302'),
   'a building and room number is not flagged');
+
+-- ---------------------------------------------------------------------------
+-- 7. Write hardening (0005). RLS cannot express "this column but not that one",
+--    so these are column privileges — and they are exactly what stopped a
+--    report owner from reverting their own moderation.
+-- ---------------------------------------------------------------------------
+
+select ok(not has_column_privilege('authenticated', 'reports', 'is_hidden', 'UPDATE'),
+  'an owner cannot un-hide their own moderated report');
+
+select ok(not has_column_privilege('authenticated', 'reports', 'governorate_id', 'UPDATE'),
+  'governorate cannot be spoofed to inject into another region''s match pool');
+
+select ok(not has_column_privilege('authenticated', 'reports', 'status', 'UPDATE'),
+  'status is earned through RPCs and triggers, never asserted by a client');
+
+select ok(not has_column_privilege('authenticated', 'reports', 'profile_id', 'UPDATE'),
+  'authorship cannot be reassigned');
+
+select ok(has_column_privilege('authenticated', 'reports', 'title', 'UPDATE'),
+  'owners can still fix their own wording');
+
+-- The governorate trigger must not be column-scoped: an UPDATE that touches
+-- only governorate_id has to fire it too.
+select is_empty(
+  $$ select 1 from pg_trigger
+      where tgname = 'reports_governorate_trg' and tgattr <> ''::int2vector $$,
+  'the governorate trigger fires on any update, not only on community_id'
+);
+
+select has_trigger('reports', 'reports_freeze_trg',
+  'identifying fields freeze once a report leaves open');
 
 select * from finish();
 rollback;

@@ -430,6 +430,21 @@ are coached to under-share.
    automatic matching, local-first ranking. Rationale and the accepted liquidity
    risk are in PROJECT.md §2.
 
+**2026-09-03**
+
+4. **Writes move to `SECURITY DEFINER` RPCs; client table access becomes
+   read-mostly.** Root cause: an RLS `WITH CHECK` cannot see the old row, so a
+   policy can say "you own this row" but never "you may change this column and
+   not that one". That gap produced two live holes — a report owner could revert
+   their own auto-hide, and anyone could rewrite `governorate_id` to inject into
+   another region's match pool. First instalment applied in
+   `0005_harden_report_writes.sql` via column privileges plus moderation RPCs;
+   the remaining tables follow in M3 before the client data layer exists.
+5. **Identifying fields freeze once a report leaves `open`.** Prevents
+   bait-and-switch: post something innocuous, collect claims, rewrite it.
+   Wording stays editable, because blocking typo fixes just pushes people to
+   delete and repost.
+
 ### Still open
 
 - Which flagship community gets back-filled and seeded before launch. Coverage
