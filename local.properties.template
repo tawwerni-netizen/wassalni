@@ -1,0 +1,15 @@
+# Copy to local.properties (git-ignored) and fill in.
+#
+# sdk.dir is written by Android Studio on first sync; set it yourself only if
+# you are building from the command line without Studio.
+# sdk.dir=C\:\\Users\\<you>\\AppData\\Local\\Android\\Sdk
+
+# From the Supabase dashboard: Project Settings -> API
+SUPABASE_URL=https://<project-ref>.supabase.co
+
+# The ANON key. Public by design — it identifies the project and authorises
+# nothing; Row Level Security is the security boundary.
+#
+# NEVER put the service_role key here. It bypasses RLS entirely and belongs
+# only in Edge Function environment variables.
+SUPABASE_ANON_KEY=

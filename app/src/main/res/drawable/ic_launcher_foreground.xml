@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A pin with a check inside: "the place where it turned up".
+  Vector rather than PNG so the icon lives in git as reviewable text.
+  Content sits inside the central 72dp safe zone of the 108dp adaptive canvas.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,28 C42.4,28 33,37.4 33,49 C33,64.8 54,82 54,82 C54,82 75,64.8 75,49 C75,37.4 65.6,28 54,28 Z M54,36 C61.2,36 67,41.8 67,49 C67,56.2 61.2,62 54,62 C46.8,62 41,56.2 41,49 C41,41.8 46.8,36 54,36 Z" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M47.5,48.6 L45,51.2 L51.6,57.6 L64,44.6 L61.4,42.1 L51.6,52.4 Z" />
+</vector>

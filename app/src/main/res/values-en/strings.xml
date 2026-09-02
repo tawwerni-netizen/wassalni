@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Wassalni</string>
+
+    <string name="tagline">Lost something? Someone may have found it.</string>
+
+    <string name="action_lost">I lost something</string>
+    <string name="action_found">I found something</string>
+    <string name="action_lost_subtitle">File a report and we will help you look</string>
+    <string name="action_found_subtitle">Help someone get their item back</string>
+
+    <string name="report_type_lost">Lost</string>
+    <string name="report_type_found">Found</string>
+
+    <string name="home_greeting">Welcome to Wassalni</string>
+    <string name="home_placeholder_note">Placeholder screen — the feed arrives in M4.</string>
+
+    <string name="scope_venue">My place</string>
+    <string name="scope_district">My area</string>
+    <string name="scope_governorate">My governorate</string>
+    <string name="scope_country">All of Egypt</string>
+    <string name="scope_widen">Widen the search</string>
+
+    <string name="common_next">Next</string>
+    <string name="common_back">Back</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_retry">Try again</string>
+    <string name="common_search">Search</string>
+
+    <string name="error_generic">Something went wrong. Try again.</string>
+    <string name="error_offline">You are offline right now.</string>
+    <string name="error_sensitive_number">Do not put card, ID, or phone numbers in a report.</string>
+
+    <string name="cd_app_logo">Wassalni logo</string>
+</resources>

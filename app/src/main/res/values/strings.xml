@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic is the DEFAULT locale, not a translation. Egyptian register: write it
+  the way someone would say it out loud, not the way a press release would.
+  English lives in values-en/.
+
+  Copy rules for this product:
+    * Never imply certainty about a match. "قد يكون" always, never "تم العثور".
+    * Never blame the user for a failed search — an empty feed is our problem.
+    * FOUND reporters get restrictive coaching; LOST reporters get encouraging
+      coaching. They are not the same flow.
+-->
+<resources>
+    <string name="app_name">وصلني</string>
+
+    <!-- Value proposition -->
+    <string name="tagline">ضاع منك شيء؟ يمكن حد لاقيه ومستنيك.</string>
+
+    <!-- The two primary actions. These are the whole product. -->
+    <string name="action_lost">فقدت شيئًا</string>
+    <string name="action_found">وجدت شيئًا</string>
+    <string name="action_lost_subtitle">اعمل بلاغ وهنساعدك تدوّر</string>
+    <string name="action_found_subtitle">ساعد حد يرجّع حاجته</string>
+
+    <!-- Report types -->
+    <string name="report_type_lost">مفقود</string>
+    <string name="report_type_found">موجود</string>
+
+    <!-- Placeholder home, replaced in M4 -->
+    <string name="home_greeting">أهلاً بك في وصلني</string>
+    <string name="home_placeholder_note">الشاشة دي مؤقتة — الخلاصة هتيجي في M4.</string>
+
+    <!-- Scope -->
+    <string name="scope_venue">مكاني</string>
+    <string name="scope_district">المنطقة</string>
+    <string name="scope_governorate">المحافظة</string>
+    <string name="scope_country">كل مصر</string>
+    <string name="scope_widen">وسّع البحث</string>
+
+    <!-- Common -->
+    <string name="common_next">التالي</string>
+    <string name="common_back">رجوع</string>
+    <string name="common_cancel">إلغاء</string>
+    <string name="common_retry">حاول تاني</string>
+    <string name="common_search">بحث</string>
+
+    <!-- Errors -->
+    <string name="error_generic">حصلت مشكلة. حاول تاني.</string>
+    <string name="error_offline">مفيش إنترنت دلوقتي.</string>
+    <string name="error_sensitive_number">لا تكتب أرقام بطاقات أو هويات أو تليفونات في البلاغ.</string>
+
+    <!-- Accessibility -->
+    <string name="cd_app_logo">شعار وصلني</string>
+</resources>

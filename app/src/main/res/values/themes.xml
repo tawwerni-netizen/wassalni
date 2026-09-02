@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      A bare Material3 splash theme. Everything visual after the first frame is
+      Compose (core:designsystem); this exists only so the window background
+      does not flash white before the theme applies.
+    -->
+    <style name="Theme.Wassalni" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  HTTPS only, everywhere, including debug builds. There is no localhost
+  exception: the backend is Supabase over TLS in every environment, so a
+  cleartext allowance would only ever mask a misconfiguration.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>
