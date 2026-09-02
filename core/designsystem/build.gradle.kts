@@ -7,6 +7,10 @@ plugins {
 android {
     namespace = "com.wassalni.core.designsystem"
     compileSdk = 35
+    // The SDK on this machine has build-tools 34.0.0 and 36.0.0, not the 35.0.0
+    // AGP 8.7 defaults to. Pinned so the build does not silently demand a
+    // download that CI would not need.
+    buildToolsVersion = "36.0.0"
 
     defaultConfig {
         minSdk = 24

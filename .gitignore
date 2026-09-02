@@ -3,7 +3,11 @@
 /local.properties
 /.idea/
 .DS_Store
-/build
+# Gradle output. Must be "build/" not "/build" — the leading slash anchors to
+# the repo root and misses app/build, core/*/build, which is how 1471 generated
+# files reached a commit.
+build/
+**/build/
 /captures
 .externalNativeBuild
 .cxx
