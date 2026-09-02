@@ -183,21 +183,32 @@ $$;
 -- movement history for a named person. This is the worst privacy outcome the
 -- product can produce and it existed by accident.
 
+-- Revoking a column's SELECT also blocks FILTERING by it, which is the actual
+-- attack: PostgREST needs SELECT on a column to accept `?profile_id=eq.<uuid>`.
+-- The base table stays otherwise readable, so RLS policies on other tables that
+-- reference `reports` in EXISTS subqueries keep working.
 revoke select (profile_id) on reports from authenticated;
 
--- Clients read this instead of the base table. Ownership arrives as a boolean,
--- so nothing joinable leaves the server.
-create or replace view v_reports with (security_invoker = true) as
+-- Deliberately NOT security_invoker. Under invoker semantics this view would be
+-- subject to the revoke above and could not compute is_mine at all. As a
+-- definer view it can read profile_id, reduce it to a boolean, and hand back
+-- nothing joinable — but that means RLS is bypassed inside it, so the row rules
+-- must be stated here explicitly rather than inherited.
+create or replace view v_reports as
   select r.id, r.report_type, r.status, r.community_id, r.governorate_id,
          r.area_id, r.category_id, r.color_id, r.brand, r.title, r.description,
-         r.occurred_on, r.occurred_time_bucket, r.is_hidden,
+         r.occurred_on, r.occurred_time_bucket,
          r.created_at, r.updated_at,
          (r.profile_id = auth.uid()) as is_mine,
          p.display_name as author_display_name,
          p.returns_count as author_returns_count
     from reports r
     left join profiles p on p.id = r.profile_id
-   where r.status <> 'removed' and not r.is_hidden;
+   where
+     -- mirrors the reports_read policy, which this view no longer inherits
+     r.profile_id = auth.uid()
+     or current_is_staff()
+     or (r.status <> 'removed' and not r.is_hidden);
 
 grant select on v_reports to authenticated;
 
