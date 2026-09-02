@@ -26,3 +26,10 @@
 # Supabase realtime + postgrest models
 -keep class io.github.jan.supabase.** { *; }
 -dontwarn io.github.jan.supabase.**
+
+# Credential Manager's Play Services backend is loaded reflectively and only
+# needed on devices that actually have it.
+-if class androidx.credentials.CredentialManager
+-keep class androidx.credentials.playservices.** {
+  *;
+}

@@ -98,23 +98,60 @@ excluded for prefs, databases and files.
       already covered it; every cross-table ownership policy broken by that
       same revoke; two `CREATE OR REPLACE` overload collisions; one
       `ANY((select ...))` parsed as the wrong SQL form entirely
-- [ ] Supabase Auth: Google Sign-In (primary) + email/password (fallback) — **in progress**
-- [ ] Display-name capture (2–40 chars, no real-name requirement)
-- [ ] Onboarding: value prop → the two big actions 🔴 فقدت شيئًا / 🟢 وجدت شيئًا
-- [ ] Session persistence, silent refresh, sign-out
-- [ ] Suspended-account gate
-- [ ] Language switcher UI (`AppLocale`, Arabic default, English switch)
+### Android — compiles and builds (debug + release/R8), NOT device-tested
+
+- [x] `AuthRepository` / `SupabaseAuthRepository`: email sign-up, email sign-in,
+      Google ID-token sign-in, sign-out
+- [x] `ProfileRepository` / `SupabaseProfileRepository`: `sessionState` combines
+      `auth.sessionStatus` with a manual `refresh()` trigger — needed because a
+      plain DB write (e.g. setting a display name) doesn't change the auth
+      session, so nothing would otherwise tell the UI the row changed
+- [x] `SessionState` (Loading/SignedOut/Suspended/SignedIn) as the single gate
+      for the whole app — `WassalniApp.kt` renders `SuspendedScreen` with no
+      `NavHost` around it at all, not just "no button leads anywhere"
+- [x] Display-name capture screen, shown while the profile still has the
+      signup trigger's placeholder name
+- [x] Google Sign-In implemented via Credential Manager +
+      `auth.signInWith(IDToken)`, gated on `BuildConfig.GOOGLE_WEB_CLIENT_ID` —
+      hidden rather than shown broken, since no Google Cloud OAuth client
+      exists yet (see LIMITATIONS)
+- [x] Language switcher (`AppLocale`, Settings screen) — Arabic default,
+      English switch, `WassalniTheme`'s layout direction follows the active
+      locale rather than being pinned
+- [ ] Session persistence / silent refresh — relies on `autoLoadFromStorage` +
+      `alwaysAutoRefresh` from M0's Supabase client config; unverified without
+      a live project or a device to kill-and-relaunch against
+- [ ] Onboarding value-prop screen — `HomePlaceholderScreen` still stands in;
+      real onboarding is M4 scope
+
+**Verified this session:** `assembleDebug`, `assembleRelease` (R8 minification
+succeeds with the credential-manager keep rule from M0), and `test` (22/22,
+unchanged — `core:model` wasn't touched) all green. **Not verified:** nothing
+has run on a device or emulator — none exists in this environment and setting
+one up (system image download, AVD creation) was out of scope for this pass.
+The sign-in flow, the display-name gate, the suspended gate, and the language
+switch are all unexercised at runtime.
+
+**Two real API mistakes caught only by compiling, not by review:**
+`SessionStatus` lives at `io.github.jan.supabase.auth.status`, not
+`io.github.jan.supabase.auth` — a plausible guess that was simply wrong. And
+`Postgrest.update()`'s DSL (`set("col", value)` / `filter { eq(...) }`) was
+verified against the real docs before writing it, specifically because a wrong
+guess there would have been a silent runtime failure rather than a compile
+error.
 
 **Decision recorded:** no SMS OTP. Egyptian SMS costs roughly $0.03–0.05 per
 message and is trivially abusable; phone verification moves to the backlog as a
 *trust signal*, not an auth factor.
 
 **Acceptance** — a new user completes sign-up to the home screen in under 60
-seconds with no keyboard entry beyond a display name (Google path).
+seconds with no keyboard entry beyond a display name (Google path). **Not yet
+demonstrated** — needs a device/emulator and a live Supabase project.
 
 **Tests** — ViewModel unit tests for each auth state; Compose test for the
 onboarding flow; instrumented test that a killed-and-relaunched app stays
-signed in.
+signed in. **None of these exist yet** — this pass produced the implementation,
+not its test coverage.
 
 **Security** — tokens in `EncryptedSharedPreferences`; no credential logging
 (a lint rule fails the build on `Log.*` containing `token`/`password`); pgTAP:

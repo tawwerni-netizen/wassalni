@@ -51,4 +51,34 @@
 
     <!-- Accessibility -->
     <string name="cd_app_logo">شعار وصلني</string>
+
+    <!-- Auth -->
+    <string name="auth_continue_with_google">تسجيل الدخول بحساب جوجل</string>
+    <string name="auth_email">البريد الإلكتروني</string>
+    <string name="auth_password">كلمة السر</string>
+    <string name="auth_sign_in">تسجيل الدخول</string>
+    <string name="auth_sign_up">إنشاء حساب</string>
+    <string name="auth_switch_to_sign_up">لسه معملتش حساب؟ اعمل واحد</string>
+    <string name="auth_switch_to_sign_in">عندك حساب بالفعل؟ سجّل الدخول</string>
+    <string name="auth_error_invalid_credentials">البريد الإلكتروني أو كلمة السر غلط.</string>
+    <string name="auth_error_email_in_use">البريد الإلكتروني ده متسجل بحساب قبل كده.</string>
+    <string name="auth_error_weak_password">كلمة السر ضعيفة — استخدم ٦ حروف أو أرقام على الأقل.</string>
+
+    <!-- Display name capture -->
+    <string name="display_name_title">تحب نناديك إيه؟</string>
+    <string name="display_name_subtitle">الاسم ده هيظهر للناس اللي هتساعدهم أو هتساعدك</string>
+    <string name="display_name_label">الاسم</string>
+    <string name="display_name_continue">استمرار</string>
+    <string name="display_name_error_length">الاسم لازم يكون من حرفين لحد ٤٠ حرف</string>
+
+    <!-- Suspended account -->
+    <string name="suspended_title">حسابك متوقف مؤقتًا</string>
+    <string name="suspended_body">تم إيقاف حسابك بسبب مخالفة قواعد الاستخدام. لو ده حصل غلط، تقدر تتواصل معانا.</string>
+    <string name="suspended_reason_prefix">السبب: %1$s</string>
+    <string name="suspended_sign_out">تسجيل الخروج</string>
+
+    <!-- Settings / language -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_sign_out">تسجيل الخروج</string>
 </resources>

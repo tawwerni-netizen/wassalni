@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.wassalni.app.ui.home.HomePlaceholderScreen
 import com.wassalni.core.designsystem.WassalniTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -15,7 +14,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WassalniTheme {
-                HomePlaceholderScreen()
+                WassalniApp()
             }
         }
     }

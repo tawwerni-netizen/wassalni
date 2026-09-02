@@ -32,4 +32,30 @@
     <string name="error_sensitive_number">Do not put card, ID, or phone numbers in a report.</string>
 
     <string name="cd_app_logo">Wassalni logo</string>
+
+    <string name="auth_continue_with_google">Continue with Google</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_sign_in">Sign in</string>
+    <string name="auth_sign_up">Create account</string>
+    <string name="auth_switch_to_sign_up">Don\'t have an account? Create one</string>
+    <string name="auth_switch_to_sign_in">Already have an account? Sign in</string>
+    <string name="auth_error_invalid_credentials">That email or password isn\'t right.</string>
+    <string name="auth_error_email_in_use">That email already has an account.</string>
+    <string name="auth_error_weak_password">That password is too weak — use at least 6 characters.</string>
+
+    <string name="display_name_title">What should we call you?</string>
+    <string name="display_name_subtitle">This name is shown to people you help or who help you</string>
+    <string name="display_name_label">Name</string>
+    <string name="display_name_continue">Continue</string>
+    <string name="display_name_error_length">Name must be 2–40 characters</string>
+
+    <string name="suspended_title">Your account is suspended</string>
+    <string name="suspended_body">Your account was suspended for violating our usage rules. If you think this is a mistake, you can contact us.</string>
+    <string name="suspended_reason_prefix">Reason: %1$s</string>
+    <string name="suspended_sign_out">Sign out</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_sign_out">Sign out</string>
 </resources>

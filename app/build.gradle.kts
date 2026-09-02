@@ -39,6 +39,13 @@ android {
 
         buildConfigField("String", "SUPABASE_URL", "\"${secret("SUPABASE_URL")}\"")
         buildConfigField("String", "SUPABASE_ANON_KEY", "\"${secret("SUPABASE_ANON_KEY")}\"")
+        // A Google Cloud OAuth "Web application" client ID (not the Android
+        // client ID) — Credential Manager's native Google flow always uses the
+        // web client id as the audience. Left blank until that OAuth client and
+        // the matching Supabase Auth provider both exist; the sign-in screen
+        // hides the Google option whenever this is blank rather than showing a
+        // button that would fail every time.
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${secret("GOOGLE_WEB_CLIENT_ID")}\"")
 
         // Arabic-first. English is the only other locale we ship.
         resourceConfigurations += setOf("ar", "en")
@@ -102,6 +109,12 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
+
+    // Native Google sign-in via Credential Manager, feeding an ID token into
+    // supabase-kt's IDToken auth provider. See AuthRepository for the flow.
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.google.id)
 
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
