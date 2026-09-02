@@ -1,0 +1,17 @@
+# Normalise to LF in the repository. Windows checkouts still get CRLF for the
+# formats that want it; everything else stays LF so the Linux CI jobs and the
+# Gradle wrapper script behave.
+* text=auto eol=lf
+
+*.bat        text eol=crlf
+gradlew      text eol=lf
+*.sh         text eol=lf
+
+*.jar        binary
+*.png        binary
+*.jpg        binary
+*.webp       binary
+*.ttf        binary
+*.otf        binary
+*.keystore   binary
+*.jks        binary

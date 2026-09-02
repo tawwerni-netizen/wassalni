@@ -1,0 +1,24 @@
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Secrets — never commit. See local.properties.template.
+google-services.json
+**/google-services.json
+*.jks
+*.keystore
+/keystore.properties
+.env
+.env.*
+!.env.template
+
+# Supabase CLI
+/supabase/.branches
+/supabase/.temp
