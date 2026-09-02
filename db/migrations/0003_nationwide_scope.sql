@@ -105,16 +105,22 @@ create or replace function reports_set_governorate()
 returns trigger language plpgsql as $$
 declare
   v_kind community_kind;
+  v_ancestor_ids uuid[];
 begin
-  select c.kind into v_kind from communities c where c.id = new.community_id;
+  select c.kind, c.ancestor_ids into v_kind, v_ancestor_ids
+    from communities c where c.id = new.community_id;
   if v_kind is null then raise exception 'COMMUNITY_NOT_FOUND'; end if;
   if v_kind in ('country','governorate') then
     raise exception 'COMMUNITY_NOT_REPORTABLE: reports attach to a venue or district, not a %', v_kind;
   end if;
 
+  -- `= any((select ...))` parses as ANY (subquery), not ANY (array); see the
+  -- 0005 redefinition of this same function for the full explanation. Fixed
+  -- here too so this file is correct standalone, even though 0005 supersedes
+  -- it moments later in the applied migration order.
   select c.id into new.governorate_id
     from communities c
-   where c.id = any((select ancestor_ids from communities where id = new.community_id))
+   where c.id = any(v_ancestor_ids)
      and c.kind = 'governorate';
 
   return new;

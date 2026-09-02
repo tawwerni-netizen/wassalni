@@ -59,8 +59,10 @@ create or replace function reports_set_governorate()
 returns trigger language plpgsql as $$
 declare
   v_kind community_kind;
+  v_ancestor_ids uuid[];
 begin
-  select c.kind into v_kind from communities c where c.id = new.community_id;
+  select c.kind, c.ancestor_ids into v_kind, v_ancestor_ids
+    from communities c where c.id = new.community_id;
   if v_kind is null then raise exception 'COMMUNITY_NOT_FOUND'; end if;
   if v_kind in ('country','governorate') then
     raise exception 'COMMUNITY_NOT_REPORTABLE: reports attach to a venue or district, not a %', v_kind;
@@ -68,9 +70,15 @@ begin
 
   -- Recomputed on every write, so a supplied value is always overwritten
   -- rather than trusted.
+  --
+  -- `= any((select ...))` is a trap: the extra parens make Postgres parse this
+  -- as the SQL-standard "ANY (subquery)" form — compare against each ROW the
+  -- subquery returns — not "ANY (array)". Our subquery returns one row holding
+  -- one uuid[] value, so that form tried to evaluate `uuid = uuid[]` and
+  -- failed. Selecting the array into a plain variable first is unambiguous.
   select c.id into new.governorate_id
     from communities c
-   where c.id = any((select ancestor_ids from communities where id = new.community_id))
+   where c.id = any(v_ancestor_ids)
      and c.kind = 'governorate';
 
   return new;

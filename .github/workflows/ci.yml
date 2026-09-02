@@ -69,18 +69,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client postgresql-15-pgtap
 
-      - name: Create the auth schema Supabase provides
-        # The migrations reference auth.users and auth.uid(). Locally we stub
-        # them so the schema can be validated without a Supabase project.
-        run: |
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "
-            create schema if not exists auth;
-            create table if not exists auth.users (id uuid primary key);
-            create or replace function auth.uid() returns uuid
-              language sql stable as \$\$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid \$\$;
-            create role authenticated;
-            create role anon;
-          "
+      - name: Bootstrap the Supabase platform stub
+        # Real Supabase already provides the auth/storage schemas, the
+        # anon/authenticated/service_role roles, THEIR DEFAULT GRANTS, and the
+        # realtime publication. Vanilla Postgres provides none of it. This
+        # fixture replicates just enough for our migrations and RLS tests to
+        # mean something — in particular, a fresh Postgres table has NO
+        # privileges for other roles by default, so without replicating
+        # Supabase's default grants, every `revoke ... from authenticated` in
+        # our migrations would test against a table that was never granted in
+        # the first place, and the assertion would pass either way.
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/tests/fixtures/000_local_only_bootstrap.sql
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
 
@@ -95,5 +94,10 @@ jobs:
 
       - name: Run schema invariants
         run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/tests/001_schema_invariants.sql
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+
+      - name: Run RLS behaviour tests
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/tests/002_rls_behaviour.sql
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres

@@ -61,8 +61,14 @@ select is(
   'the approved-claim index is partial, scoped to status = approved'
 );
 
-select col_is_null('claims', 'finder_confirmed_at', 'finder confirmation starts null');
-select col_is_null('claims', 'claimant_confirmed_at', 'claimant confirmation starts null');
+-- col_is_null asserts the column is nullable with no NOT NULL constraint.
+-- Combined with having no explicit DEFAULT (true here), a fresh row leaves it
+-- NULL until confirm_return() sets it — this is a schema-level proxy for that,
+-- not a fixture-and-check of an actual inserted row.
+select col_is_null('claims', 'finder_confirmed_at',
+  'finder confirmation is nullable with no default, so it starts unset');
+select col_is_null('claims', 'claimant_confirmed_at',
+  'claimant confirmation is nullable with no default, so it starts unset');
 
 -- ---------------------------------------------------------------------------
 -- 4. State machine.

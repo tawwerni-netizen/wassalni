@@ -80,13 +80,30 @@ excluded for prefs, databases and files.
 
 ## M1 — Authentication and onboarding
 
-- [ ] Supabase Auth: Google Sign-In (primary) + email/password (fallback)
-- [ ] `profiles` row created on first sign-in (DB trigger on `auth.users`)
+### Database, verified against a real Postgres (11 migrations, 44+7 pgTAP assertions, all green)
+
+- [x] `profiles` row created on first sign-in (`0008`: `AFTER INSERT ON auth.users` trigger)
+- [x] `v_my_profile`: self-only view exposing `role`/`is_suspended`, which
+      0006's column-narrowing had accidentally hidden from a user reading
+      their own row (`0010`)
+- [x] `anonymize_my_data()` RPC: reports anonymised, P2 hard-deleted (`0010`).
+      **Not done: deleting the `auth.users` row itself** — Supabase's own
+      guidance is the Admin API (service role), not raw SQL, and that needs an
+      Edge Function this environment cannot deploy. See LIMITATIONS below.
+- [x] Storage buckets + `storage.objects` policies mirroring `report_images`;
+      explicit Realtime publication allowlist (`0007`)
+- [x] Optimistic concurrency (`p_expected_updated_at`) on every mutating RPC (`0009`)
+- [x] Found and fixed while implementing (see ARCHITECTURE.md §9, decisions
+      6–9): a column-revoke that did nothing because a table-level grant
+      already covered it; every cross-table ownership policy broken by that
+      same revoke; two `CREATE OR REPLACE` overload collisions; one
+      `ANY((select ...))` parsed as the wrong SQL form entirely
+- [ ] Supabase Auth: Google Sign-In (primary) + email/password (fallback) — **in progress**
 - [ ] Display-name capture (2–40 chars, no real-name requirement)
 - [ ] Onboarding: value prop → the two big actions 🔴 فقدت شيئًا / 🟢 وجدت شيئًا
-- [ ] Session persistence, silent refresh, sign-out, account deletion
-      (anonymise reports, hard-delete P2)
+- [ ] Session persistence, silent refresh, sign-out
 - [ ] Suspended-account gate
+- [ ] Language switcher UI (`AppLocale`, Arabic default, English switch)
 
 **Decision recorded:** no SMS OTP. Egyptian SMS costs roughly $0.03–0.05 per
 message and is trivially abusable; phone verification moves to the backlog as a

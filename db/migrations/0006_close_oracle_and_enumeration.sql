@@ -183,11 +183,29 @@ $$;
 -- movement history for a named person. This is the worst privacy outcome the
 -- product can produce and it existed by accident.
 
+-- CAUGHT BY RUNNING THIS AGAINST A REAL DATABASE, not by inspection: a
+-- column-level `REVOKE SELECT (col)` only cancels a column-level GRANT. It
+-- does NOT shrink a broader TABLE-LEVEL SELECT the role already holds (every
+-- role here holds one, from Supabase's platform-default grant on the public
+-- schema). With only the line below, `authenticated` kept reading profile_id
+-- straight off the base table — the fix looked right and did nothing.
+--
+-- The working pattern is the same one already used for UPDATE in 0005: revoke
+-- the table-level privilege entirely, then grant back an explicit column list.
 -- Revoking a column's SELECT also blocks FILTERING by it, which is the actual
 -- attack: PostgREST needs SELECT on a column to accept `?profile_id=eq.<uuid>`.
--- The base table stays otherwise readable, so RLS policies on other tables that
--- reference `reports` in EXISTS subqueries keep working.
-revoke select (profile_id) on reports from authenticated;
+revoke select on reports from authenticated;
+
+grant select (
+  id, report_type, status, community_id, governorate_id, area_id,
+  category_id, color_id, brand, title, description,
+  occurred_on, occurred_time_bucket, is_hidden, hidden_reason,
+  normalized_text, search_vector, created_at, updated_at
+) on reports to authenticated;
+
+-- profile_id deliberately excluded. v_reports below can still read it (it is
+-- NOT security_invoker, so it runs as its owner, independent of this grant)
+-- and reduces it to a boolean before handing anything back to a client.
 
 -- Deliberately NOT security_invoker. Under invoker semantics this view would be
 -- subject to the revoke above and could not compute is_mine at all. As a
@@ -233,6 +251,10 @@ grant select (id, display_name, returns_count, community_id) on profiles to auth
 -- The fix preserves the real use case and kills the harvesting one: someone who
 -- lost a thing searches for that thing by name. Nobody legitimately browses
 -- every jewelry report in Egypt by page number.
+
+-- CREATE OR REPLACE cannot change a function's return type (setof reports ->
+-- setof v_reports here), so the old one from 0003 must be dropped first.
+drop function if exists search_reports(text, uuid, report_type, text, uuid, text, date, date, int, int);
 
 create or replace function search_reports(
   p_query        text default null,

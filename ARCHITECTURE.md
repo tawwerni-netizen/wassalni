@@ -445,6 +445,59 @@ are coached to under-share.
    Wording stays editable, because blocking typo fixes just pushes people to
    delete and repost.
 
+**2026-09-03 — found by actually running the migrations against Postgres, not by review**
+
+6. **A column-level `REVOKE SELECT` cannot shrink a table-level `SELECT` the
+   role already holds.** `revoke select (profile_id) on reports from
+   authenticated;` (0006) did nothing, because every role already held
+   table-level SELECT from Supabase's platform default grant, and a
+   column-level revoke only cancels a column-level grant — it doesn't touch a
+   broader table-level one. The working pattern, already used for `UPDATE` in
+   0005: revoke the table-level privilege entirely, then grant back an
+   explicit column list (0006, corrected).
+7. **RLS policies on OTHER tables that read `reports.profile_id` in a
+   subquery need real `SELECT` privilege on it — a table's own bare
+   `profile_id = auth.uid()` in its own policy does not.** Postgres treats a
+   table's row under its own policy like a trigger's NEW/OLD — free to read.
+   A different table's policy reaching into `reports` via
+   `exists (select 1 from reports r where ...)` is an ordinary query and is
+   fully subject to column grants. Revoking `profile_id` therefore broke
+   every cross-table ownership check in the schema (images, P1/P2 details,
+   claims, match candidates, conversations, messages) until each was rewritten
+   against a `SECURITY DEFINER` helper, `current_owns_report(uuid)` —
+   the same pattern `current_is_staff()`/`current_community_id()` already
+   established for `profiles` (0011).
+8. **`CREATE OR REPLACE FUNCTION` cannot change a return type or an argument
+   list — either one produces a second overload, not a replacement.**
+   `search_reports` changing `setof reports` to `setof v_reports`, and all
+   eight `_v2`-style functions in 0009 adding `p_expected_updated_at`, each
+   silently created an ambiguous overload until an explicit `drop function
+   if exists <old signature>` preceded the replacement.
+9. **`x = ANY((select ...))` is a trap.** The extra parens make Postgres parse
+   it as the SQL-standard `ANY (subquery)` form — compare against each row a
+   subquery returns — not `ANY (array)`. A subquery returning one row holding
+   one `uuid[]` tried to evaluate `uuid = uuid[]` and failed
+   (`reports_set_governorate`, 0003/0005). Select the array into a variable
+   first; there is no syntax that makes the array form of `ANY` unambiguous
+   inline here.
+10. **Optimistic concurrency (0009) raises a distinct `STALE_STATE`
+    exception on a mismatch rather than returning the current row.**
+    ARCHITECTURE originally implied returning current state inline; a raised
+    exception aborts the transaction, so doing that would mean every mutating
+    RPC's return type becomes a jsonb envelope instead of a scalar. No client
+    exists yet to consume that contract (repositories land in M3/M6), so this
+    was deliberately scoped down: the client catches `STALE_STATE` and
+    refetches. Revisit if a screen ever needs the row back in the same round
+    trip.
+
+All of 6–9 were caught by applying every migration to a real (local, vanilla)
+Postgres and running the pgTAP suites against it — none were visible from
+reading the SQL. See `db/tests/fixtures/000_local_only_bootstrap.sql` (a
+from-scratch replica of Supabase's platform-default grants, without which
+`revoke ... from authenticated` tests pass trivially because there was nothing
+to revoke) and `db/tests/002_rls_behaviour.sql` (role-switched behavioural
+tests, as opposed to 001's schema-structure-only assertions).
+
 ### Still open
 
 - Which flagship community gets back-filled and seeded before launch. Coverage
