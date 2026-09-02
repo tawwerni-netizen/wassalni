@@ -84,6 +84,9 @@ dependencies {
     implementation(project(":core:designsystem"))
 
     implementation(libs.androidx.core.ktx)
+    // Only for AppCompatDelegate.setApplicationLocales, which backports the
+    // per-app language switch below API 33. We do not use AppCompatActivity.
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)

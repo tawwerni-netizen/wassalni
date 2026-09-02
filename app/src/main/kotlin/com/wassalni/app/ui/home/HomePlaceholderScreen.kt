@@ -151,9 +151,9 @@ private fun PrimaryActionCard(
     }
 }
 
-// Every screen is checked in RTL and LTR, light and dark. The LTR preview is
-// not decoration: a layout that only works in one direction is a bug we would
-// otherwise ship to English-locale users.
+// Arabic is the default language and English is a switch the user can make, so
+// both directions are real shipping states. The LTR preview is not decoration:
+// a layout that only works in one direction makes the language toggle cosmetic.
 
 @Preview(name = "RTL light", locale = "ar", showBackground = true)
 @Composable
@@ -167,10 +167,10 @@ private fun PreviewRtlDark() {
     WassalniTheme(darkTheme = true) { HomePlaceholderScreen() }
 }
 
-@Preview(name = "LTR light", locale = "en", showBackground = true)
+@Preview(name = "LTR light (English)", locale = "en", showBackground = true)
 @Composable
 private fun PreviewLtrLight() {
-    WassalniTheme(darkTheme = false, forceLayoutDirection = LayoutDirection.Ltr) {
+    WassalniTheme(darkTheme = false, overrideLayoutDirection = LayoutDirection.Ltr) {
         HomePlaceholderScreen()
     }
 }

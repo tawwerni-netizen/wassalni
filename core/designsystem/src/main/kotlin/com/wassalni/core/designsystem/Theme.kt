@@ -20,23 +20,29 @@ object WassalniTheme {
 }
 
 /**
- * The app is Arabic-first, so RTL is the default rather than something derived
- * from the device locale. A user whose phone is set to English still gets an
- * Arabic RTL app unless they choose otherwise — that is the intended product
- * behaviour, not an accident.
+ * Arabic is the app's default language, and the user can switch to English.
  *
- * [forceLayoutDirection] exists so previews and screenshot tests can assert the
- * LTR rendering too; every screen must be checked in both.
+ * Layout direction therefore FOLLOWS THE ACTIVE LOCALE — it is not pinned to
+ * RTL. Arabic is the default because `values/` holds Arabic and the app
+ * declares `ar` as its default locale, so a fresh install is RTL; switching to
+ * English must flip the whole layout to LTR, or the English mode reads as
+ * broken. Pinning RTL here would have made the language switch cosmetic.
+ *
+ * [overrideLayoutDirection] is for previews and screenshot tests only, so both
+ * directions can be asserted without changing the device locale. Leave it null
+ * in production code.
  */
 @Composable
 fun WassalniTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    forceLayoutDirection: LayoutDirection? = LayoutDirection.Rtl,
+    overrideLayoutDirection: LayoutDirection? = null,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = if (darkTheme) WassalniDarkColors else WassalniLightColors
     val typeColors = if (darkTheme) DarkReportTypeColors else LightReportTypeColors
-    val direction = forceLayoutDirection ?: LocalLayoutDirection.current
+    // LocalLayoutDirection already reflects the active locale, so the null case
+    // is a pass-through rather than a decision.
+    val direction = overrideLayoutDirection ?: LocalLayoutDirection.current
 
     CompositionLocalProvider(
         LocalReportTypeColors provides typeColors,

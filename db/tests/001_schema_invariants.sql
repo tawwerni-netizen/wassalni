@@ -10,7 +10,7 @@
 begin;
 create extension if not exists pgtap;
 
-select plan(32);
+select plan(44);
 
 -- ---------------------------------------------------------------------------
 -- 1. RLS is on everywhere. Default deny is the whole security model; a single
@@ -164,6 +164,41 @@ select is_empty(
 
 select has_trigger('reports', 'reports_freeze_trg',
   'identifying fields freeze once a report leaves open');
+
+-- ---------------------------------------------------------------------------
+-- 8. The oracle, enumeration and image-leak fixes (0006).
+-- ---------------------------------------------------------------------------
+
+select ok(not has_table_privilege('authenticated', 'claim_answers', 'SELECT'),
+  'a claimant cannot read per-question grading feedback (the guessing oracle)');
+
+select ok(not has_table_privilege('authenticated', 'claim_answers', 'UPDATE'),
+  'a claimant cannot edit an answer after seeing it graded');
+
+select ok(not has_table_privilege('authenticated', 'claims', 'UPDATE'),
+  'claim state changes go through RPCs, never a direct write');
+
+select has_column('claims', 'attempt_count', 'claim attempts are counted and capped');
+
+-- Read one report, take the author id, filter every report by it: a dated,
+-- located movement history for a named person.
+select ok(not has_column_privilege('authenticated', 'reports', 'profile_id', 'SELECT'),
+  'authorship is not joinable, so a person''s movements cannot be reconstructed');
+
+select has_view('v_reports', 'clients read reports through a view that exposes ownership as a boolean');
+
+-- Images
+select has_trigger('report_images', 'report_images_privacy_trg',
+  'FOUND and document images default to private');
+select has_trigger('report_images', 'report_images_document_guard_trg',
+  'document images can never be made public');
+select has_trigger('report_images', 'report_images_cap_trg',
+  'the three-image cap is enforced server-side, not just in the client');
+
+-- Rate limits that were documented but never wired up
+select has_trigger('reports', 'reports_rate_limit_trg', 'report creation is rate limited');
+select has_trigger('messages', 'messages_rate_limit_trg', 'messaging is rate limited');
+select has_trigger('moderation_reports', 'moderation_rate_limit_trg', 'abuse reporting is rate limited');
 
 select * from finish();
 rollback;

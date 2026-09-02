@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic first: it is listed first and is the app's default locale, so a fresh
+  install comes up in Arabic regardless of the phone's language. English is
+  offered as a switch, not as a fallback.
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android"
+    android:defaultLocale="ar">
+    <locale android:name="ar" />
+    <locale android:name="en" />
+</locale-config>
