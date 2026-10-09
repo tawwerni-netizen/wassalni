@@ -23,6 +23,9 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
       - name: Assemble debug
         run: ./gradlew assembleDebug --stacktrace
         env:
@@ -64,10 +67,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install pgTAP
+      - name: Install client and pgTAP
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql-client postgresql-15-pgtap
+          sudo apt-get install -y postgresql-client
+          CONTAINER=$(docker ps -q --filter "ancestor=postgres:15" | head -n 1)
+          if [ -z "$CONTAINER" ]; then
+            CONTAINER=$(docker ps -q --filter "publish=5432" | head -n 1)
+          fi
+          echo "Found postgres container: $CONTAINER"
+          docker exec -u 0 "$CONTAINER" apt-get update
+          docker exec -u 0 "$CONTAINER" apt-get install -y postgresql-15-pgtap
 
       - name: Bootstrap the Supabase platform stub
         # Real Supabase already provides the auth/storage schemas, the
